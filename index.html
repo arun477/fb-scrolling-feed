@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>scroll demo</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  
+  <style>
+  body, html {
+    margin:0;
+    padding:auto;
+    text-align:center;
+
+    overflow-x:hidden;
+  }
+  #feedPage {
+     background-color:;
+     padding:;
+     min-height:;
+     color:;
+  }
+
+  .msgbox {
+    opacity:;
+  }
+
+  .contentimg {
+    width:200px;
+    height:200px;
+    
+  }
+
+  .well {
+    background-color:crimson;
+    color:white;
+    margin:;
+    padding:3%;
+    border:2px solid black;
+  }
+
+  #initicon {
+   
+  }
+ 
+  </style>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+
+<div class='containerfluid' id='feedPage' >
+<h1> MY FEEDS </h1>
+<div id='inputField'>
+<input  id='accessToken' type='next' placeholder='Enter your access token here' />
+<button id='getFeed' class='btn btn-primary'>Get Feed</button>
+<div>
+
+
+  
+</div>
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+ 
+ $(document).ready(function(){
+
+    console.log('hey welcome to the fb feed page');
+
+   $('#getFeed').click(function(){
+    
+        $('#feedPage').append("<div id='icoon' class='msgbox' ><img id='loadIcon' src='loadingIcon.svg' /></div>")
+
+      let accessToken = $('#accessToken').val()
+      $('#inputField').hide()
+      console.log(accessToken);
+
+
+         // DEFINE NEXT pagging url
+    let next = null;
+
+
+
+   // initial feed load up
+   $.ajax({
+    url:"https://graph.facebook.com/v2.10/me?fields=feed.limit(5)%7Bfull_picture%2Cstory%2Cmessage%2Cdescription%7D&access_token="+accessToken,
+
+    success : function(response){
+      console.log(response);
+      let feeds = response.feed.data
+
+      // set the pagging url
+      next = response.feed.paging.next;
+      console.log(next);
+
+      let parent = $('#feedPage')
+       
+      for(let i in feeds){
+
+
+        if(feeds[i].full_picture){
+           
+           
+           parent.append("<div class='msgbox  well'><img class='contentimg ' src="+feeds[i].full_picture+" /><p>"+feeds[i].description+"</p></div>");
+               
+              
+
+        } else if(feeds[i].message) {
+
+          let parent = $('#feedPage')
+           console.log(parent)
+           parent.append("<div class='msgbox  well'><p>"+feeds[i].message+"</p></div>");
+
+
+
+
+        }
+      }
+           
+          $('#icoon').remove();
+          $('.msgbox').fadeIn(2000);
+
+          parent.append("<div id='icoon' class='msgbox' ><img id='loadIcon' src='loadingIcon.svg' /></div>")
+    }
+   })
+   
+
+
+
+     $(window).scroll(function(){
+             
+
+
+        if($(document).height()-$(window).height()-$(window).scrollTop()===0){
+
+          console.log('hey, we reached the bottom');
+
+          // CALL THE FB API APPEND THE FURTHER FEEDS
+
+           $.ajax({
+    url:next,
+
+    success : function(response){
+      console.log(response);
+      let feeds = response.data
+
+      // set the pagging url
+      next = response.paging.next;
+      console.log(next);
+
+      let parent = $('#feedPage')
+
+      for(let i in feeds){
+        if(feeds[i].full_picture){
+           
+           console.log(parent)
+           parent.append("<div class='msgbox  well'><img class='contentimg ' src="+feeds[i].full_picture+" /><p>"+feeds[i].description+"</p></div>");
+
+             
+        } else if(feeds[i].message) {
+
+          let parent = $('#feedPage')
+           console.log(parent)
+           parent.append("<div class='msgbox  well'><p>"+feeds[i].message+"</p></div>");
+           
+
+        }
+      }  
+         $('#icoon').remove();
+
+         $('.msgbox').fadeIn('slow');
+        // append the loading icon
+        parent.append("<div  id='icoon' class='msgbox' ><img id='loadIcon' src='loadingIcon.svg' /></div>")
+    }
+
+   })
+
+
+        }
+
+          
+     }) // end of the scroll event 
+
+
+
+   }) 
+
+
+
+
+
+
+
+   
+        
+
+
+ })
+
+
+</script>
+ 
+</body>
+</html>
+
